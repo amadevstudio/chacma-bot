@@ -4,7 +4,7 @@ export default async function start(d: ConstructedParams) {
   await d.outerSender(d.chat.id, [
     {
       type: "text",
-      text: d.i18n.t(["start", "message"]),
-    },
+      text: d.i18n.t(["start", "s", "message"]) + " " + d.i18n.t(["start", "n", "zxc", "numtest"], { num: 123, vars: ["123", "aaa"] })
+    }
   ]);
 }

@@ -2,7 +2,7 @@
   "name": "bot",
   "module": "./src/index.ts",
   "scripts": {
-    "start": "bun run ./src/index.ts"
+    "start": "bun --watch run ./src/index.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

@@ -9,6 +9,10 @@ const envSchema = z.object({
   TEST_TELEGRAM: z.string(),
 
   APP_NAME: z.string(),
+
+  REDIS_URL: z.string().url(),
+
+  ENVIRONMENT: z.enum(["development", "production"]),
 });
 
 export default envSchema.parse(process.env);

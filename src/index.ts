@@ -28,4 +28,4 @@ const botConfig: BotConfig<AvailableRoutes, AvailableActions> = {
   environment: ENV.ENVIRONMENT,
 };
 
-initializeBot(ENV.BOT_TOKEN, ENV.REDIS_URL, botConfig);
+(await initializeBot(ENV.BOT_TOKEN, ENV.REDIS_URL, botConfig)).start();

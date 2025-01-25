@@ -3,7 +3,7 @@ import type { ConstructedParams } from "yau/src/core/types";
 import { localRouteNameMap } from "../routes";
 
 type MenuData = {
-  someData?: string;
+  fromStart?: boolean;
 };
 
 export async function start(d: ConstructedParams) {
@@ -13,50 +13,83 @@ export async function start(d: ConstructedParams) {
       text: d.i18n.t(["start", "s", "message"]),
       inlineMarkup: [
         [
-          d.components.buildButton(localRouteNameMap.menu, "Open menu", {
-            someData: "Some data",
-          } as MenuData),
-        ],
-        [
           d.components.buildButton(
-            localRouteNameMap.deepMethod,
-            "Or go deeper"
+            localRouteNameMap.menu,
+            d.i18n.t(["start", "s", "openMenu"]),
+            {
+              fromStart: true,
+            } as MenuData
           ),
         ],
       ],
     },
   ] as const;
 
-  return d.render(messages, { resending: d.isCommand });
+  await d.render(messages);
 }
 
 export async function menu(d: ConstructedParams) {
-  const data = d.unitedData as MenuData;
+  d.services.userStateService.clearUserStorage(); // New beginning
+
+  const isFromStart = (d.unitedData as MenuData).fromStart === true;
 
   const messages: MessageStructure[] = [
     {
       type: "text",
-      text: data.someData ? "Hello there with " + data.someData : "Hello there",
+      text:
+        (isFromStart
+          ? d.i18n.t(["menu", "s", "fromStartMessage"]) + "\n\n"
+          : "") + d.i18n.t(["menu", "s", "message"]),
       inlineMarkup: [
-        [d.components.buildButton(localRouteNameMap.deepMethod, "Deeper")],
+        [
+          d.components.buildButton(
+            "",
+            d.i18n.t(["menu", "s", "buttons", "addChannel"])
+          ),
+          d.components.buildButton(
+            "",
+            d.i18n.t(["menu", "s", "buttons", "myChannels"])
+          ),
+        ],
+        [
+          d.components.buildButton(
+            "",
+            d.i18n.t(["menu", "s", "buttons", "help"])
+          ),
+          d.components.buildButton(
+            localRouteNameMap.terms,
+            d.i18n.t(["menu", "s", "buttons", "terms"])
+          ),
+        ],
+        [
+          d.components.buildButton(
+            "",
+            d.i18n.t(["menu", "s", "buttons", "payment"])
+          ),
+          d.components.buildButton(
+            "",
+            d.i18n.t(["menu", "s", "buttons", "settings"])
+          ),
+        ],
       ],
     },
-    {
-      type: "text",
-      text: "And there",
-      inlineMarkup: d.components.goBack.buildLayout(),
-    },
-  ] as const;
-  return d.render(messages, { resending: d.isCommand });
+  ];
+
+  await d.render(messages);
 }
 
-export async function deepMethod(d: ConstructedParams) {
+export async function terms(d: ConstructedParams) {
   const messages: MessageStructure[] = [
     {
       type: "text",
-      text: "Just goBack state",
+      text:
+        "<blockquote expandable>" +
+        d.i18n.t(["terms", "s", "message"]) +
+        "</blockquote>",
+      parseMode: "HTML",
       inlineMarkup: d.components.goBack.buildLayout(),
     },
   ] as const;
-  return d.render(messages);
+
+  await d.render(messages);
 }

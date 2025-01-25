@@ -1,12 +1,12 @@
 import type { Routes, LocalRoutes } from "yau/src/core/types";
-import { start, menu, deepMethod } from "./user/entry";
+import { start, menu, terms } from "./user/entry";
 import {
   buildRoutesList,
   buildRoutes,
   buildEntityNamesMap,
 } from "yau/src/controller/defaultRoutes";
 
-type LocalRouteNames = "start" | "menu" | "deepMethod";
+type LocalRouteNames = "start" | "menu" | "terms";
 type LocalActionNames = string;
 
 const localRoutes: LocalRoutes<LocalRouteNames, LocalActionNames> = {
@@ -19,10 +19,10 @@ const localRoutes: LocalRoutes<LocalRouteNames, LocalActionNames> = {
     method: menu,
     availableFrom: ["command", "callback"],
   },
-  deepMethod: {
-    method: deepMethod,
-    availableFrom: ["callback"],
-  },
+  terms: {
+    method: terms,
+    availableFrom: ["command", "callback"]
+  }
 };
 
 export const localRouteNameMap = buildEntityNamesMap(localRoutes);

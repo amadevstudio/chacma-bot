@@ -13,6 +13,7 @@ import configureI18n, {
   navigation,
   type AvailableLanguages,
 } from "./public/i18n";
+import { middlewares } from "./middleware/middlewares";
 
 const fallbackLanguageCode = "en";
 
@@ -27,6 +28,8 @@ const botConfig: BotConfig<
 > = {
   routes,
   defaultRoute: "menu",
+
+  middlewares: middlewares,
 
   i18n,
   defaultTextGetters: {

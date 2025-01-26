@@ -1,12 +1,12 @@
 import type { MessageStructure } from "yau/src/controller/types";
-import type { ConstructedParams } from "yau/src/core/types";
+import type { ControllerConstructedParams } from "yau/src/core/types";
 import { localRouteNameMap } from "../routes";
 
 type MenuData = {
   fromStart?: boolean;
 };
 
-export async function start(d: ConstructedParams) {
+export async function start(d: ControllerConstructedParams) {
   const messages: MessageStructure[] = [
     {
       type: "text",
@@ -28,7 +28,7 @@ export async function start(d: ConstructedParams) {
   await d.render(messages);
 }
 
-export async function menu(d: ConstructedParams) {
+export async function menu(d: ControllerConstructedParams) {
   d.services.userStateService.clearUserStorage(); // New beginning
 
   const isFromStart = (d.unitedData as MenuData).fromStart === true;
@@ -78,7 +78,7 @@ export async function menu(d: ConstructedParams) {
   await d.render(messages);
 }
 
-export async function terms(d: ConstructedParams) {
+export async function terms(d: ControllerConstructedParams) {
   const messages: MessageStructure[] = [
     {
       type: "text",

@@ -1,4 +1,13 @@
 import type { CustomMiddleware } from "yau/src/core/types";
-import { registerUser } from "./registerUser";
+import { makeRegisterUserMiddleware } from "./registerUserMiddleware";
+import type { MakeServices } from "../service/services";
 
-export const middlewares: CustomMiddleware[] = [registerUser];
+type MakeMiddlewares = (p: {
+  services: ReturnType<MakeServices>;
+}) => CustomMiddleware[];
+
+export const makeMiddlewares = ({
+  services,
+}: Parameters<MakeMiddlewares>[0]): ReturnType<MakeMiddlewares> => {
+  return [makeRegisterUserMiddleware({ services })];
+};

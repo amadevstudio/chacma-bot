@@ -1,40 +1,55 @@
 import type { Routes, LocalRoutes } from "yau/src/core/types";
-import { start, menu, terms } from "./user/entry";
 import {
   buildRoutesList,
   buildRoutes,
   buildEntityNamesMap,
 } from "yau/src/controller/defaultRoutes";
+import type { MakeServices } from "../service/services";
+import { makeEntryRoutes } from "./user/entry";
 
-type LocalRouteNames = "start" | "menu" | "terms";
+const localRouteNames = ["start", "menu", "terms"] as const;
+
+type LocalRouteNames = (typeof localRouteNames)[number];
+
+// TODO
 type LocalActionNames = string;
+export type AvailableActions = LocalActionNames;
 
-const localRoutes: LocalRoutes<LocalRouteNames, LocalActionNames> = {
-  start: {
-    method: start,
-    availableFrom: ["command"],
-    routes: ["menu"],
-  },
-  menu: {
-    method: menu,
-    availableFrom: ["command", "callback"],
-  },
-  terms: {
-    method: terms,
-    availableFrom: ["command", "callback"]
-  }
-};
-
-export const localRouteNameMap = buildEntityNamesMap(localRoutes);
-
-const availableRoutes = buildRoutesList<LocalRouteNames>(
-  Object.keys(localRoutes) as LocalRouteNames[]
-);
+export const localRouteNameMap = buildEntityNamesMap(localRouteNames);
+const availableRoutes = buildRoutesList(localRouteNames);
 
 console.log(availableRoutes);
 
 export type AvailableRoutes = (typeof availableRoutes)[number];
 
-export const routes: Routes<AvailableRoutes> = buildRoutes(localRoutes);
+// const routes: Routes<AvailableRoutes> = buildRoutes(localRoutes);
 
-export type AvailableActions = LocalActionNames;
+type MakeRoutes = (p: {
+  services: ReturnType<MakeServices>;
+}) => Routes<AvailableRoutes>;
+
+export const makeRoutes = ({
+  services,
+}: Parameters<MakeRoutes>[0]): ReturnType<MakeRoutes> => {
+  // TODO: remove
+  console.log(services);
+
+  const entryRoutes = makeEntryRoutes();
+
+  const localRoutes: LocalRoutes<LocalRouteNames, LocalActionNames> = {
+    start: {
+      method: entryRoutes.start,
+      availableFrom: ["command"],
+      routes: ["menu"],
+    },
+    menu: {
+      method: entryRoutes.menu,
+      availableFrom: ["command", "callback"],
+    },
+    terms: {
+      method: entryRoutes.terms,
+      availableFrom: ["command", "callback"],
+    },
+  };
+  return buildRoutes(localRoutes);
+};

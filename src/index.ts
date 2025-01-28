@@ -5,7 +5,7 @@ import type { BotConfig } from "yau/src/core/types";
 import {
   type AvailableActions,
   type AvailableRoutes,
-  routes,
+  makeRoutes
 } from "./controller/routes";
 import setupI18n from "yau/src/i18n/setup";
 
@@ -13,13 +13,20 @@ import configureI18n, {
   navigation,
   type AvailableLanguages,
 } from "./public/i18n";
-import { middlewares } from "./middleware/middlewares";
+import { makeMiddlewares } from "./middleware/middlewares";
+import { makeRepositories } from "./repository/repositories";
+import { makeServices } from "./service/services";
 
 const fallbackLanguageCode = "en";
 
 const i18n = setupI18n(configureI18n({ appName: ENV.APP_NAME }), {
   fallbackLanguageCode: fallbackLanguageCode,
 });
+
+const repositories = makeRepositories({ baseUrl: "http://localhost:3000" });
+const services = makeServices({ repositories });
+const middlewares = makeMiddlewares({ services });
+const routes = makeRoutes({ services });
 
 const botConfig: BotConfig<
   AvailableRoutes,

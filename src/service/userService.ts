@@ -12,7 +12,7 @@ export type MakeUserService = (p: {
 
 function getCachedUser(chatId: number) {
   // TODO: go to repo and redis
-  console.log(chatId);
+  console.log(chatId, "TODO CACHED USER");
   return undefined;
 }
 

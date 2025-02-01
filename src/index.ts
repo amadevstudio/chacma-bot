@@ -1,21 +1,13 @@
 import ENV from "./env";
 
-import initializeBot from "yau/src/core/botSetup";
-import type { BotConfig } from "yau/src/core/types";
-import {
-  type AvailableActions,
-  type AvailableRoutes,
-  makeRoutes
-} from "./controller/routes";
-import setupI18n from "yau/src/i18n/setup";
+import { makeRoutes } from "./controller/routes";
 
-import configureI18n, {
-  navigation,
-  type AvailableLanguages,
-} from "./public/i18n";
+import configureI18n, { navigation } from "./public/i18n";
 import { makeMiddlewares } from "./middleware/middlewares";
 import { makeRepositories } from "./repository/repositories";
 import { makeServices } from "./service/services";
+import type { G } from "./controller/routeConsts";
+import { setupI18n, type BotConfig, initializeBot } from "yau";
 
 const fallbackLanguageCode = "en";
 
@@ -28,11 +20,7 @@ const services = makeServices({ repositories });
 const middlewares = makeMiddlewares({ services });
 const routes = makeRoutes({ services });
 
-const botConfig: BotConfig<
-  AvailableRoutes,
-  AvailableActions,
-  AvailableLanguages
-> = {
+const botConfig: BotConfig<G> = {
   routes,
   defaultRoute: "menu",
 
@@ -40,7 +28,7 @@ const botConfig: BotConfig<
 
   i18n,
   defaultTextGetters: {
-    goBack: (languageCode: AvailableLanguages) =>
+    goBack: (languageCode) =>
       navigation.s.goBack[languageCode] ??
       navigation.s.goBack[fallbackLanguageCode],
   },
@@ -49,4 +37,5 @@ const botConfig: BotConfig<
   environment: ENV.ENVIRONMENT,
 };
 
-(await initializeBot(ENV.BOT_TOKEN, ENV.REDIS_URL, botConfig)).start();
+const bot = await initializeBot(ENV.BOT_TOKEN, ENV.REDIS_URL, botConfig);
+bot.start();

@@ -1,8 +1,4 @@
-import type { NextF } from "yau/src/controller/types";
-import type {
-  CustomMiddleware,
-  MiddlewareConstructedParams,
-} from "yau/src/core/types";
+import type { NextF, CustomMiddleware, MiddlewareConstructedParams } from "yau";
 import type { MakeServices } from "../service/services";
 
 type MakeRegisterUserMiddleware = (p: {

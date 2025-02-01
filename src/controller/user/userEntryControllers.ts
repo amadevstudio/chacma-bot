@@ -1,18 +1,17 @@
-import type { MessageStructure } from "yau/src/controller/types";
-import type { ControllerConstructedParams, Route } from "yau/src/core/types";
-import { localRouteNameMap } from "../routes";
+import type { MessageStructure, ControllerConstructedParams, Route } from "yau";
+import { localRouteNameMap, type G } from "../routeConsts";
 
 type MenuData = {
   fromStart?: boolean;
 };
 
-type MakeEntryRoutes = () => {
-  [key in "start" | "menu" | "terms"]: Route["method"];
+type MakeUserEntryRoutes = () => {
+  [key in "start" | "menu" | "terms"]: Route<G>["method"];
 };
 
-export function makeEntryRoutes(): ReturnType<MakeEntryRoutes> {
+export function makeUserEntryRoutes(): ReturnType<MakeUserEntryRoutes> {
   return {
-    start: async (d: ControllerConstructedParams) => {
+    start: async (d) => {
       const messages: MessageStructure[] = [
         {
           type: "text",
@@ -35,8 +34,6 @@ export function makeEntryRoutes(): ReturnType<MakeEntryRoutes> {
     },
 
     menu: async (d: ControllerConstructedParams) => {
-      d.services.userStateService.clearUserStorage(); // New beginning
-
       const isFromStart = (d.unitedData as MenuData).fromStart === true;
 
       const messages: MessageStructure[] = [
@@ -49,7 +46,7 @@ export function makeEntryRoutes(): ReturnType<MakeEntryRoutes> {
           inlineMarkup: [
             [
               d.components.buildButton(
-                "",
+                localRouteNameMap.addControlledChannel,
                 d.i18n.t(["menu", "s", "buttons", "addChannel"])
               ),
               d.components.buildButton(

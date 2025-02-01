@@ -1,4 +1,4 @@
-import type { CustomMiddleware } from "yau/src/core/types";
+import type { CustomMiddleware } from "yau";
 import { makeRegisterUserMiddleware } from "./registerUserMiddleware";
 import type { MakeServices } from "../service/services";
 

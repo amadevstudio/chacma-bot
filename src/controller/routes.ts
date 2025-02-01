@@ -1,42 +1,18 @@
-import type { Routes, LocalRoutes } from "yau/src/core/types";
-import {
-  buildRoutesList,
-  buildRoutes,
-  buildEntityNamesMap,
-} from "yau/src/controller/defaultRoutes";
+import { type Routes, buildRoutes } from "yau";
 import type { MakeServices } from "../service/services";
-import { makeEntryRoutes } from "./user/entry";
+import { makeUserEntryRoutes } from "./user/userEntryControllers";
+import { makeControlledChannelsRoutes } from "./controlledChannels/controlledChannelsController";
+import { type G, type LR } from "./routeConsts";
 
-const localRouteNames = ["start", "menu", "terms"] as const;
-
-type LocalRouteNames = (typeof localRouteNames)[number];
-
-// TODO
-type LocalActionNames = string;
-export type AvailableActions = LocalActionNames;
-
-export const localRouteNameMap = buildEntityNamesMap(localRouteNames);
-const availableRoutes = buildRoutesList(localRouteNames);
-
-console.log(availableRoutes);
-
-export type AvailableRoutes = (typeof availableRoutes)[number];
-
-// const routes: Routes<AvailableRoutes> = buildRoutes(localRoutes);
-
-type MakeRoutes = (p: {
-  services: ReturnType<MakeServices>;
-}) => Routes<AvailableRoutes>;
+type MakeRoutes = (p: { services: ReturnType<MakeServices> }) => Routes<G>;
 
 export const makeRoutes = ({
   services,
 }: Parameters<MakeRoutes>[0]): ReturnType<MakeRoutes> => {
-  // TODO: remove
-  console.log(services);
+  const entryRoutes = makeUserEntryRoutes();
+  const controlledChannelRoutes = makeControlledChannelsRoutes({ services });
 
-  const entryRoutes = makeEntryRoutes();
-
-  const localRoutes: LocalRoutes<LocalRouteNames, LocalActionNames> = {
+  const localRoutes: LR = {
     start: {
       method: entryRoutes.start,
       availableFrom: ["command"],
@@ -45,10 +21,17 @@ export const makeRoutes = ({
     menu: {
       method: entryRoutes.menu,
       availableFrom: ["command", "callback"],
+      routes: ["terms", "addControlledChannel"],
     },
     terms: {
       method: entryRoutes.terms,
       availableFrom: ["command", "callback"],
+    },
+
+    addControlledChannel: {
+      method: controlledChannelRoutes.addControlledChannel,
+      availableFrom: ["command", "callback"],
+      hasReplyKeyboard: true,
     },
   };
   return buildRoutes(localRoutes);

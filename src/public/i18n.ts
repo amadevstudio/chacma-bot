@@ -1,4 +1,4 @@
-import type { Dictionary } from "yau/src/i18n/setup";
+import type { Dictionary } from "yau";
 
 export type AvailableLanguages = "ru" | "en";
 

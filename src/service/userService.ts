@@ -1,8 +1,10 @@
+import type { ProjectLogger } from "../lib/logger";
 import type { MakeRepositories } from "../repository/repositories";
 import type { UserWithAccountsWithType } from "../types/entities";
 
 export type MakeUserService = (p: {
   repositories: ReturnType<MakeRepositories>;
+  logger: ProjectLogger;
 }) => {
   registerUser: (p: {
     chatId: number;
@@ -10,18 +12,22 @@ export type MakeUserService = (p: {
   }) => Promise<UserWithAccountsWithType | undefined>;
 };
 
-function getCachedUser(chatId: number) {
-  // TODO: go to repo and redis
-  console.log(chatId, "TODO CACHED USER");
+function getCachedUser(
+  chatId: number,
+  logger: { warn: (...v: unknown[]) => void }
+) {
+  // TODO: move to repo and redis
+  logger.warn(chatId, "TODO CACHED USER");
   return undefined;
 }
 
 export function makeUserService({
   repositories,
+  logger,
 }: Parameters<MakeUserService>[0]): ReturnType<MakeUserService> {
   return {
     registerUser: async (params) => {
-      const cachedUser = getCachedUser(params.chatId);
+      const cachedUser = getCachedUser(params.chatId, logger);
       if (cachedUser !== undefined) {
         return;
       }

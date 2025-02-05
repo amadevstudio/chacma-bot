@@ -1,3 +1,4 @@
+import type { ProjectLogger } from "../lib/logger";
 import type { Requester } from "../lib/requester";
 import type { UserWithAccountsWithType } from "../types/entities";
 
@@ -7,7 +8,10 @@ type RegisterUserBody = {
   languageCode?: string;
 };
 
-export type MakeUserRepository = (p: { requester: Requester }) => {
+export type MakeUserRepository = (p: {
+  requester: Requester;
+  logger: ProjectLogger;
+}) => {
   registerUser: (p: {
     chatId: number;
     languageCode?: string;

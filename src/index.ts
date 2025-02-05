@@ -8,6 +8,7 @@ import { makeRepositories } from "./repository/repositories";
 import { makeServices } from "./service/services";
 import type { G } from "./controller/routeConsts";
 import { setupI18n, type BotConfig, initializeBot } from "yau";
+import initializeLogger from "./lib/logger";
 
 const fallbackLanguageCode = "en";
 
@@ -15,10 +16,12 @@ const i18n = setupI18n(configureI18n({ appName: ENV.APP_NAME }), {
   fallbackLanguageCode: fallbackLanguageCode,
 });
 
-const repositories = makeRepositories({ baseUrl: "http://localhost:3000" });
-const services = makeServices({ repositories });
-const middlewares = makeMiddlewares({ services });
-const routes = makeRoutes({ services });
+const logger = initializeLogger();
+
+const repositories = makeRepositories({ baseUrl: "http://localhost:3000", logger });
+const services = makeServices({ repositories, logger });
+const middlewares = makeMiddlewares({ services, logger });
+const routes = makeRoutes({ services, logger });
 
 const botConfig: BotConfig<G> = {
   routes,

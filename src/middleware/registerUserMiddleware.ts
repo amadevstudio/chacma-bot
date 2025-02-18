@@ -1,5 +1,5 @@
 import type { NextF, CustomMiddleware, MiddlewareConstructedParams } from "yau";
-import type { MakeServices } from "../service/services";
+import type { MakeServices } from "../service/_services";
 import type { ProjectLogger } from "../lib/logger";
 
 type MakeRegisterUserMiddleware = (p: {

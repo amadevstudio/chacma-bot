@@ -1,5 +1,5 @@
 import { type Routes, buildRoutes } from "yau";
-import type { MakeServices } from "../service/services";
+import type { MakeServices } from "../service/_services";
 import { makeUserEntryRoutes } from "./user/userEntryControllers";
 import { makeControlledChannelsRoutes } from "./controlledChannels/controlledChannelsController";
 import { type G, type LR } from "./routeConsts";

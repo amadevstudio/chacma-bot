@@ -3,12 +3,14 @@ import ENV from "./env";
 import { makeRoutes } from "./controller/routes";
 
 import configureI18n, { navigation } from "./public/i18n";
-import { makeMiddlewares } from "./middleware/middlewares";
-import { makeRepositories } from "./repository/repositories";
-import { makeServices } from "./service/services";
+import { makeMiddlewares } from "./middleware/_middlewares";
+import { makeRepositories } from "./repository/_repositories";
+import { makeServices } from "./service/_services";
 import type { G } from "./controller/routeConsts";
-import { setupI18n, type BotConfig, initializeBot } from "yau";
+import { setupI18n, type InitializeSystemConfig, initializeBot } from "yau";
 import initializeLogger from "./lib/logger";
+import { createDbConnection } from "./db/drizzle";
+import type { TeleBot } from "yau";
 
 const fallbackLanguageCode = "en";
 
@@ -18,16 +20,24 @@ const i18n = setupI18n(configureI18n({ appName: ENV.APP_NAME }), {
 
 const logger = initializeLogger();
 
-const repositories = makeRepositories({ baseUrl: "http://localhost:3000", logger });
-const services = makeServices({ repositories, logger });
-const middlewares = makeMiddlewares({ services, logger });
-const routes = makeRoutes({ services, logger });
+const db = createDbConnection({ logger });
 
-const botConfig: BotConfig<G> = {
-  routes,
+const initializeProject = (bot: TeleBot) => {
+  const repositories = makeRepositories({
+    baseUrl: "http://localhost:3000",
+    logger,
+    db,
+  });
+  const services = makeServices({ repositories, logger, bot });
+  const middlewares = makeMiddlewares({ services, logger });
+  const routes = makeRoutes({ services, logger });
+  return { routes, middlewares };
+};
+
+const botConfig: InitializeSystemConfig<G> = {
+  initializeProject,
+
   defaultRoute: "menu",
-
-  middlewares: middlewares,
 
   i18n,
   defaultTextGetters: {

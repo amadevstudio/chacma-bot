@@ -1,16 +1,6 @@
 import type { ProjectLogger } from "../lib/logger";
-import type { MakeRepositories } from "../repository/repositories";
-import type { UserWithAccountsWithType } from "../types/entities";
-
-export type MakeUserService = (p: {
-  repositories: ReturnType<MakeRepositories>;
-  logger: ProjectLogger;
-}) => {
-  registerUser: (p: {
-    chatId: number;
-    languageCode?: string;
-  }) => Promise<UserWithAccountsWithType | undefined>;
-};
+import type { MakeRepositories } from "../repository/_repositories";
+import type { Consts } from "./_types";
 
 function getCachedUser(
   chatId: number,
@@ -24,9 +14,14 @@ function getCachedUser(
 export function makeUserService({
   repositories,
   logger,
-}: Parameters<MakeUserService>[0]): ReturnType<MakeUserService> {
+  consts,
+}: {
+  repositories: ReturnType<MakeRepositories>;
+  logger: ProjectLogger;
+  consts: Consts;
+}) {
   return {
-    registerUser: async (params) => {
+    registerUser: async (params: { chatId: number; languageCode?: string }) => {
       const cachedUser = getCachedUser(params.chatId, logger);
       if (cachedUser !== undefined) {
         return;
@@ -35,6 +30,7 @@ export function makeUserService({
       const user = await repositories.userRepository.registerUser({
         chatId: params.chatId,
         languageCode: params.languageCode,
+        serviceType: consts.serviceType,
       });
 
       // TODO: cache user
@@ -43,3 +39,5 @@ export function makeUserService({
     },
   } as const;
 }
+
+export type MakeUserService = typeof makeUserService;

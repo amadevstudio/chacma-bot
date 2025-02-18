@@ -1,6 +1,6 @@
 import type { CustomMiddleware } from "yau";
 import { makeRegisterUserMiddleware } from "./registerUserMiddleware";
-import type { MakeServices } from "../service/services";
+import type { MakeServices } from "../service/_services";
 import { makeSetRequestIdMiddleware } from "./setRequestIdMiddleware";
 import type { ProjectLogger } from "../lib/logger";
 

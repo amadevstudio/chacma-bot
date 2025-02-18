@@ -13,6 +13,8 @@ const envSchema = z.object({
   REDIS_URL: z.string().url(),
 
   ENVIRONMENT: z.enum(["development", "production"]).default("development"),
+
+  DATABASE_URL: z.string().url()
 });
 
 export default envSchema.parse(process.env);

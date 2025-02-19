@@ -6,7 +6,7 @@ import { generateUniqueId } from "../lib/random";
 export const makeSetRequestIdMiddleware =
   (): CustomMiddleware =>
   async (_params: MiddlewareConstructedParams, next: NextF) => {
-    RequestContext.run(async () => {
+    await RequestContext.run(async () => {
       RequestContext.set("botRequestId", generateUniqueId());
       await next();
     });

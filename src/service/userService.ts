@@ -1,6 +1,4 @@
-import type { ProjectLogger } from "../lib/logger";
-import type { MakeRepositories } from "../repository/_repositories";
-import type { Consts } from "./_types";
+import type { DbServiceParams } from "./_types";
 
 function getCachedUser(
   chatId: number,
@@ -15,11 +13,7 @@ export function makeUserService({
   repositories,
   logger,
   consts,
-}: {
-  repositories: ReturnType<MakeRepositories>;
-  logger: ProjectLogger;
-  consts: Consts;
-}) {
+}: DbServiceParams) {
   return {
     registerUser: async (params: { chatId: number; languageCode?: string }) => {
       const cachedUser = getCachedUser(params.chatId, logger);

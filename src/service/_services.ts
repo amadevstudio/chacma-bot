@@ -4,16 +4,18 @@ import type { MakeRepositories } from "../repository/_repositories";
 import type { Consts } from "./_types";
 import { makeControlledChannelService } from "./controlledChannelService";
 import { makeUserService } from "./userService";
+import { makeTelegramChannelService } from "./telegramChannelService";
 
 export function makeServices({
   repositories,
   logger,
+  bot
 }: {
   repositories: ReturnType<MakeRepositories>;
   logger: ProjectLogger;
   bot: TeleBot;
 }) {
-  const serviceParams = {
+  const dbServiceParams = {
     repositories,
     logger,
     consts: {
@@ -21,9 +23,15 @@ export function makeServices({
     } as Consts,
   };
 
+  const tgServiceParams = {
+    logger,
+    bot
+  }
+
   return {
-    userService: makeUserService(serviceParams),
-    controlledChannelService: makeControlledChannelService(serviceParams),
+    userService: makeUserService(dbServiceParams),
+    controlledChannelService: makeControlledChannelService(dbServiceParams),
+    telegramChannelService: makeTelegramChannelService(tgServiceParams),
   } as const;
 }
 

@@ -1,4 +1,4 @@
-import type { Route, MessageStructure } from "yau";
+import { type Route, type MessageStructure, TeleError, TeleErrors } from "yau";
 import type { MakeServices } from "../../service/_services";
 import type { G } from "../routeConsts";
 import type { ProjectLogger } from "../../lib/logger";
@@ -43,8 +43,7 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
             ],
             inlineMarkup: d.components.goBack.buildLayout(),
           },
-        ] as const;
-
+        ];
         await d.render(messages);
         return;
       }
@@ -62,20 +61,29 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
             }
           : { id: message.text };
 
-      return;
-
       // Validate access
-      // services.controlledChannelService.v
-
-      try {
-        const registeredResult = services.controlledChannelService.createChannel();
-      } catch (e) {
-        logger.error(e);
-        // d.render()
+      const channel = await services.telegramChannelService.getChannelInfoById(
+        channelInfo.id!
+      );
+      if ("error" in channel) {
+        await d.render(d.components.emptyStateMessage({ text: channel.error }));
+        await d.services.userStateService.addUserEmptyState();
         return;
       }
 
-      // get chanenl fron tg
+      // Register
+      const registeredResult =
+        await services.controlledChannelService.createChannel({
+          ownerChatId: d.chat.id,
+          channelId: channel.id,
+        });
+      if ("error" in registeredResult) {
+        await d.render(
+          d.components.emptyStateMessage({
+            text: "An error occurred while saving the channel.",
+          })
+        );
+      }
 
       d.render([
         {

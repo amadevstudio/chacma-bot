@@ -6,32 +6,43 @@ export const makeControlledChannelService = function ({
   logger,
 }: DbServiceParams) {
   return {
-    createChannel: async ({
-      ownerChatId: chatId,
+    create: async ({
+      ownerChatId,
       channelId,
+      isOwner,
+      channelName,
     }: {
       ownerChatId: number;
       channelId: number;
+      isOwner: boolean;
+      channelName: string;
     }) => {
       try {
         // View user and self access
         const userData = await repositories.userRepository.findUser({
           serviceType: consts.serviceType,
-          accountId: String(chatId),
+          accountId: String(ownerChatId),
         });
 
         // Create
-        return repositories.controlledChannelRepository.createChannel({
-          userId: userData.user.id,
-          isOwner: true, // TODO
-          controlledChannel: {
-            accountId: String(channelId),
-            name: "Name", // TODO
-            isActive: true,
-            allowAdministrator: true,
-          },
-          serviceType: consts.serviceType,
-        });
+        const creationResult =
+          await repositories.controlledChannelRepository.create({
+            userId: userData.user.id,
+            isOwner: isOwner,
+            controlledChannel: {
+              accountId: String(channelId),
+              name: channelName,
+              isActive: true,
+              allowAdministrators: true,
+            },
+            serviceType: consts.serviceType,
+          });
+
+        if (creationResult === null) {
+          return { error: "Cannot create channel" };
+        } else {
+          return { channel: creationResult };
+        }
       } catch (e) {
         logger.error(e);
         return { error: String(e) };

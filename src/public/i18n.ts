@@ -156,7 +156,7 @@ function makeMenu() {
     s: {
       fromStartMessage: {
         en: "You are in the bot's menu. Start exploring it using the buttons below",
-        ru: "Вы в меню бота. Начните исследовать его с кнопок снизу"
+        ru: "Вы в меню бота. Начните исследовать его с кнопок снизу",
       },
       message: {
         en: "Choose desired action",
@@ -192,6 +192,58 @@ function makeMenu() {
   };
 }
 
+function makeControlledChannelAdding() {
+  return {
+    s: {
+      message: {
+        en: `Channel adding
+
+Forward the channel message or send the channel id (with minus)`,
+        ru: `Добавление канала
+Перешлите сообщение из канала или отправьте его id (с минусом)`,
+      },
+      belowMessage: {
+        en: `Or push the button and select the channel`,
+        ru: `Или нажмите кнопку и выберите канал`,
+      },
+      addChannel: {
+        en: "Add channel",
+        ru: "Добавить канал",
+      },
+      addedMessage: {
+        en: "Channel with id {0} and name '{1}' added",
+        ru: "Канал с id {0} и названием '{1}' добавлен",
+      },
+      errors: {
+        chatNotFound: {
+          en: "The specified chat was not found. The bot should be added as a channel admin and should not be blocked.",
+          ru: "Указанный чат не найден. Бот должен быть добавлен в качестве администратора канала и не должен быть заблокирован.",
+        },
+        botCantPostMessages: {
+          en: "The bot does not have permission to post messages in the channel.",
+          ru: "У бота нет разрешения на публикацию сообщений в канале.",
+        },
+        notAdmin: {
+          en: "The adding administrator must be an administrator of the channel with the right to send messages or creator of the channel.",
+          ru: "Добавляющий администратор должен быть администратором канала с правом отправки сообщений или создателем канала.",
+        },
+        onlyOwnerCanAdd: {
+          en: "Only the owner of the channel can add it to the list of controlled channels.",
+          ru: "Только владелец канала может добавить его в список управляемых каналов.",
+        },
+        whileSaving: {
+          en: "An error occurred while saving the channel.",
+          ru: "Произошла ошибка при сохранении канала.",
+        },
+        genericError: {
+          en: "An error occurred while retrieving the channel information.",
+          ru: "Произошла ошибка при получении информации о канале.",
+        },
+      },
+    },
+  } as const;
+}
+
 export default function configureI18n({
   appName,
 }: {
@@ -205,5 +257,7 @@ export default function configureI18n({
     terms: makeTerms(appName),
 
     menu: makeMenu(),
+
+    controlledChannelAdding: makeControlledChannelAdding(),
   };
 }

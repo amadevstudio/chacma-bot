@@ -24,7 +24,11 @@ export function makeServices({
   };
 
   const tgServiceParams = {
+    repositories,
     logger,
+    consts: {
+      serviceType: "telegram",
+    } as Consts,
     bot
   }
 

@@ -122,7 +122,7 @@ export const makeUserRepository = function ({ db }: ServiceParams) {
     },
 
     findUser: async (params: { serviceType: string; accountId: string }) => {
-      return await getUserInfo(db, params.serviceType, params.accountId);
+      return await getUserInfo(db, params.accountId, params.serviceType);
     },
   } as const;
 

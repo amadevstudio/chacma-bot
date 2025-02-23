@@ -13,6 +13,8 @@ export type DbServiceParams = {
 };
 
 export type TgServiceParams = {
+  repositories: ReturnType<MakeRepositories>;
   logger: ProjectLogger;
+  consts: Consts;
   bot: TeleBot;
-}
+};

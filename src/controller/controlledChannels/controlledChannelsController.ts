@@ -1,4 +1,4 @@
-import { type Route, type MessageStructure, TeleError, TeleErrors } from "yau";
+import { type Route, type MessageStructure } from "yau";
 import type { MakeServices } from "../../service/_services";
 import type { G } from "../routeConsts";
 import type { ProjectLogger } from "../../lib/logger";
@@ -14,7 +14,6 @@ type MakeControlledChannelsRoutes = (p: {
 
 export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
   services,
-  logger,
 }) => {
   return {
     addControlledChannel: async (d) => {
@@ -23,16 +22,20 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
         const messages: MessageStructure[] = [
           {
             type: "text",
-            text: "Add channel",
+            text: d.i18n.t(["controlledChannelAdding", "s", "message"]),
             inlineMarkup: d.components.goBack.buildLayout(),
           },
           {
             type: "text",
-            text: "Push the button",
+            text: d.i18n.t(["controlledChannelAdding", "s", "belowMessage"]),
             replyMarkup: [
               [
                 {
-                  text: "Add channel",
+                  text: d.i18n.t([
+                    "controlledChannelAdding",
+                    "s",
+                    "addChannel",
+                  ]),
                   request_chat: {
                     request_id: 1,
                     chat_is_channel: true,
@@ -48,10 +51,11 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
         return;
       }
 
+      // Adding channel below
       const message = d.message!;
-      type ChannelInfo = { id?: number | string; title?: string };
+      type ChannelInfo = { id?: number; title?: string };
 
-      const channelInfo: ChannelInfo =
+      const inputChannelInfo: ChannelInfo =
         message.forward_origin && "chat" in message.forward_origin
           ? message.forward_origin.chat
           : message.chat_shared
@@ -59,36 +63,55 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
               id: message.chat_shared.chat_id,
               title: message.chat_shared.title,
             }
-          : { id: message.text };
+          : { id: Number(message.text) };
 
       // Validate access
-      const channel = await services.telegramChannelService.getChannelInfoById(
-        channelInfo.id!
-      );
-      if ("error" in channel) {
-        await d.render(d.components.emptyStateMessage({ text: channel.error }));
+      const validationResult =
+        await services.telegramChannelService.validateAccess(
+          d.chat.id,
+          inputChannelInfo.id!
+        );
+      if (validationResult.error !== undefined) {
+        await d.render(
+          d.components.emptyStateMessage({
+            text: d.i18n.t(validationResult.error),
+          })
+        );
         await d.services.userStateService.addUserEmptyState();
         return;
       }
 
+      const channelInfo = await services.telegramChannelService.getInfo(
+        inputChannelInfo.id!
+      );
+
       // Register
-      const registeredResult =
-        await services.controlledChannelService.createChannel({
-          ownerChatId: d.chat.id,
-          channelId: channel.id,
-        });
+      const registeredResult = await services.controlledChannelService.create({
+        ownerChatId: d.chat.id,
+        channelId: inputChannelInfo.id!,
+        isOwner: validationResult.isOwner,
+        channelName: channelInfo.title!,
+      });
       if ("error" in registeredResult) {
         await d.render(
           d.components.emptyStateMessage({
-            text: "An error occurred while saving the channel.",
+            text: d.i18n.t([
+              "controlledChannelAdding",
+              "s",
+              "errors",
+              "whileSaving",
+            ]),
           })
         );
+        return;
       }
 
       d.render([
         {
           type: "text",
-          text: `Channel id ${channelInfo.id} title ${channelInfo.title} is added`,
+          text: d.i18n.t(["controlledChannelAdding", "s", "addedMessage"], {
+            vars: [String(channelInfo.id), channelInfo.title ?? ""],
+          }),
           inlineMarkup: d.components.goBack.buildLayout(),
         } as const,
       ]);

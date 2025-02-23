@@ -13,7 +13,7 @@ async function getChannelInfo(
   serviceType: string,
   channelId?: number
 ) {
-  return db
+  const results = await db
     .select({ channel: controlledChannelsTable })
     .from(controlledChannelsTable)
     .innerJoin(
@@ -29,13 +29,24 @@ async function getChannelInfo(
         eq(controlledChannelServicesTable.type, serviceType)
       )
     );
+  return results.length > 0 ? results[0].channel : null;
 }
 
 export const makeControlledChannelRepository = function ({
   db,
 }: ServiceParams) {
   return {
-    createChannel: async ({
+    findByServiceId: async ({
+      serviceId,
+      serviceType,
+    }: {
+      serviceId: string;
+      serviceType: string;
+    }) => {
+      return getChannelInfo(db, serviceId, serviceType);
+    },
+
+    create: async ({
       userId,
       isOwner,
       controlledChannel,
@@ -47,7 +58,7 @@ export const makeControlledChannelRepository = function ({
         accountId: string;
         name: string;
         isActive: boolean;
-        allowAdministrator: boolean;
+        allowAdministrators: boolean;
       };
       serviceType: string;
     }) => {
@@ -59,7 +70,7 @@ export const makeControlledChannelRepository = function ({
 
       // Return if exists
       if (channelInfo !== null) {
-        return channelInfo[0].channel;
+        return channelInfo;
       }
 
       // Register
@@ -88,14 +99,12 @@ export const makeControlledChannelRepository = function ({
           controlledChannelId: newChannelId,
         });
 
-        return (
-          await getChannelInfo(
-            tx,
-            controlledChannel.accountId,
-            serviceType,
-            newChannelId
-          )
-        )[0].channel;
+        return await getChannelInfo(
+          tx,
+          controlledChannel.accountId,
+          serviceType,
+          newChannelId
+        );
       });
     },
   } as const;

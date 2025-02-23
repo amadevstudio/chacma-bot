@@ -2,7 +2,10 @@
   "name": "bot",
   "module": "./src/index.ts",
   "scripts": {
-    "start": "bun --watch run ./src/index.ts"
+    "start": "bun --watch run ./src/index.ts",
+    "drop-db:dev": "bun --env-file=.env drizzle-kit --config=drizzle/drizzle.config.ts drop",
+    "push-db:dev": "bun --env-file=.env drizzle-kit --config=drizzle/drizzle.config.ts push",
+    "seed-db:dev": "bun --env-file=.env drizzle/seed.dev.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

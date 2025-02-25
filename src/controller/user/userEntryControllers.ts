@@ -18,13 +18,13 @@ export function makeUserEntryRoutes(): ReturnType<MakeUserEntryRoutes> {
           text: d.i18n.t(["start", "s", "message"]),
           inlineMarkup: [
             [
-              d.components.buildButton(
-                localRouteNameMap.menu,
-                d.i18n.t(["start", "s", "openMenu"]),
-                {
+              d.components.inlineButtons.buildState({
+                type: localRouteNameMap.menu,
+                text: d.i18n.t(["start", "s", "openMenu"]),
+                data: {
                   fromStart: true,
-                } as MenuData
-              ),
+                } as MenuData,
+              }),
             ],
           ],
         },
@@ -45,34 +45,34 @@ export function makeUserEntryRoutes(): ReturnType<MakeUserEntryRoutes> {
               : "") + d.i18n.t(["menu", "s", "message"]),
           inlineMarkup: [
             [
-              d.components.buildButton(
-                localRouteNameMap.addControlledChannel,
-                d.i18n.t(["menu", "s", "buttons", "addChannel"])
-              ),
-              d.components.buildButton(
-                "",
-                d.i18n.t(["menu", "s", "buttons", "myChannels"])
-              ),
+              d.components.inlineButtons.buildState({
+                type: localRouteNameMap.addControlledChannel,
+                text: d.i18n.t(["menu", "s", "buttons", "addChannel"]),
+              }),
+              d.components.inlineButtons.buildState({
+                type: localRouteNameMap.listControlledChannels,
+                text: d.i18n.t(["menu", "s", "buttons", "myChannels"]),
+              }),
             ],
             [
-              d.components.buildButton(
-                "",
-                d.i18n.t(["menu", "s", "buttons", "help"])
-              ),
-              d.components.buildButton(
-                localRouteNameMap.terms,
-                d.i18n.t(["menu", "s", "buttons", "terms"])
-              ),
+              d.components.inlineButtons.buildState({
+                type: "",
+                text: d.i18n.t(["menu", "s", "buttons", "help"]),
+              }),
+              d.components.inlineButtons.buildState({
+                type: localRouteNameMap.terms,
+                text: d.i18n.t(["menu", "s", "buttons", "terms"]),
+              }),
             ],
             [
-              d.components.buildButton(
-                "",
-                d.i18n.t(["menu", "s", "buttons", "payment"])
-              ),
-              d.components.buildButton(
-                "",
-                d.i18n.t(["menu", "s", "buttons", "settings"])
-              ),
+              d.components.inlineButtons.buildState({
+                type: "",
+                text: d.i18n.t(["menu", "s", "buttons", "payment"]),
+              }),
+              d.components.inlineButtons.buildState({
+                type: "",
+                text: d.i18n.t(["menu", "s", "buttons", "settings"]),
+              }),
             ],
           ],
         },

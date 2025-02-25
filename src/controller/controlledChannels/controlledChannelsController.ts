@@ -99,7 +99,7 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
               "controlledChannelAdding",
               "s",
               "errors",
-              "whileSaving",
+              registeredResult.error!,
             ]),
           })
         );
@@ -117,6 +117,52 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
       ]);
     },
 
-    listControlledChannels: async () => {},
+    listControlledChannels: async (d) => {
+      const pagingObject = await d.components.paging.buildSetup({
+        loadPageData: async ({ offset, perPage, searchQuery }) =>
+          services.controlledChannelService.listForUser(d.chat.id, {
+            offset,
+            perPage,
+            searchQuery,
+          }),
+        loadCount: async ({ searchQuery }) =>
+          services.controlledChannelService.countForUser(d.chat.id, {
+            searchQuery,
+          }),
+      });
+
+      if ("error" in pagingObject) {
+        await d.render([
+          {
+            type: "text",
+            text: d.i18n.t([
+              "controlledChannelList",
+              "s",
+              "errors",
+              pagingObject.error ,
+            ]),
+            inlineMarkup: d.components.goBack.buildLayout(),
+          },
+        ]);
+        return;
+      }
+
+      const messages: MessageStructure[] = [
+        {
+          type: "text",
+          text: "List of channels" + "\n\n" + pagingObject.helperMessage,
+          inlineMarkup: [
+            ...pagingObject.pageData.map((channelData) => [
+              d.components.inlineButtons.buildState({
+                type: "channel",
+                text: channelData.name ?? "",
+              })
+            ]),
+            ...pagingObject.markup,
+          ],
+        } as const,
+      ];
+      d.render(messages);
+    },
   };
 };

@@ -10,6 +10,8 @@ type MakeRoutes = (p: {
   logger: ProjectLogger;
 }) => Routes<G>;
 
+export const addChannelCommands = ["addChannel"];
+
 export const makeRoutes = ({
   services,
   logger,
@@ -39,10 +41,16 @@ export const makeRoutes = ({
     addControlledChannel: {
       method: controlledChannelRoutes.addControlledChannel,
       availableFrom: ["command", "callback", "message"],
-      commands: ["addChannel"],
+      commands: addChannelCommands,
       hasReplyKeyboard: true,
       waitsForInput: true,
     },
-  };
+    listControlledChannels: {
+      method: controlledChannelRoutes.listControlledChannels,
+      availableFrom: ["command", "callback", "message"],
+      commands: ["myChannels"],
+      waitsForInput: true,
+    },
+  } as const;
   return buildRoutes(localRoutes);
 };

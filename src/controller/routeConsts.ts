@@ -12,6 +12,7 @@ export const localRouteNames = [
   "menu",
   "terms",
   "addControlledChannel",
+  "listControlledChannels",
 ] as const;
 type LocalRouteNames = (typeof localRouteNames)[number];
 

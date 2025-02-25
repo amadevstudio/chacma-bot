@@ -1,12 +1,30 @@
 import type { Dictionary } from "yau";
+import { addChannelCommands } from "../controller/routes";
 
 export type AvailableLanguages = "ru" | "en";
 
-export const navigation = {
+const navigation = {
   s: {
     goBack: {
       en: "<< Go back",
       ru: "<< Назад",
+    },
+  },
+};
+
+const paging = {
+  n: {
+    navigationHelper: {
+      unite: {
+        en: "Page {0} of {1}",
+        ru: "Страница {0} из {1}",
+      },
+    },
+  },
+  s: {
+    clearSearch: {
+      en: "🆑 Clear search",
+      ru: "🆑 Очистить поиск",
     },
   },
 };
@@ -244,6 +262,37 @@ Forward the channel message or send the channel id (with minus)`,
   } as const;
 }
 
+function makeControlledChannelList() {
+  return {
+    s: {
+      errors: {
+        gettingChannels: {
+          en: "An error occurred while retrieving the list of channels.",
+          ru: "Произошла ошибка при получении списка каналов.",
+        },
+        noDataFound: {
+          en:
+            "You haven't added any channels yet. Use /" +
+            addChannelCommands[0] +
+            " to add a channel.",
+          ru:
+            "Вы ещё не добавили ни одного канала. Используйте /" +
+            addChannelCommands[0] +
+            " для добавления канала.",
+        },
+        noDataFoundInSearch: {
+          en: "No channels found for the specified query.",
+          ru: "По указанному запросу ничего не найдено.",
+        },
+        genericError: {
+          en: "An error occurred while retrieving the list of channels.",
+          ru: "Произошла ошибка при получении списка каналов.",
+        },
+      },
+    },
+  } as const;
+}
+
 export default function configureI18n({
   appName,
 }: {
@@ -251,6 +300,7 @@ export default function configureI18n({
 }): Dictionary<AvailableLanguages> {
   return {
     navigation,
+    paging,
 
     start: makeStart(appName),
 
@@ -259,5 +309,6 @@ export default function configureI18n({
     menu: makeMenu(),
 
     controlledChannelAdding: makeControlledChannelAdding(),
-  };
+    controlledChannelList: makeControlledChannelList(),
+  } as const;
 }

@@ -2,7 +2,7 @@ import ENV from "./env";
 
 import { makeRoutes } from "./controller/routes";
 
-import configureI18n, { navigation } from "./public/i18n";
+import configureI18n from "./public/i18n";
 import { makeMiddlewares } from "./middleware/_middlewares";
 import { makeRepositories } from "./repository/_repositories";
 import { makeServices } from "./service/_services";
@@ -41,9 +41,15 @@ const botConfig: InitializeSystemConfig<G> = {
 
   i18n,
   defaultTextGetters: {
-    goBack: (languageCode) =>
-      navigation.s.goBack[languageCode] ??
-      navigation.s.goBack[fallbackLanguageCode],
+    goBack: () => ["navigation", "s", "goBack"],
+    paging: {
+      navigationHelper: () => ["paging", "n", "navigationHelper"],
+      clearSearch: () => ["paging", "s", "clearSearch"],
+    },
+  },
+
+  paging: {
+    defaultPerPage: 5,
   },
 
   testTelegram: ENV.TEST_TELEGRAM === "true",

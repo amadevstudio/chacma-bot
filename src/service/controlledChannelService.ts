@@ -45,7 +45,36 @@ export const makeControlledChannelService = function ({
         }
       } catch (e) {
         logger.error(e);
-        return { error: String(e) };
+        return { error: "whileSaving" };
+      }
+    },
+
+    listForUser: async (
+      userChatId: number,
+      p: { offset: number; perPage: number; searchQuery?: string }
+    ) => {
+      try {
+        return await repositories.controlledChannelRepository.listForUser(
+          consts.serviceType,
+          String(userChatId),
+          p
+        );
+      } catch (e) {
+        logger.error(e);
+        return { error: "gettingChannels" };
+      }
+    },
+
+    countForUser: async (userChatId: number, p: { searchQuery?: string }) => {
+      try {
+        return await repositories.controlledChannelRepository.countForUser(
+          consts.serviceType,
+          String(userChatId),
+          p
+        );
+      } catch (e) {
+        logger.error(e);
+        return { error: "gettingChannels" };
       }
     },
   };

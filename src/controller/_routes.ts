@@ -2,7 +2,7 @@ import { type Routes, buildRoutes } from "yau";
 import type { MakeServices } from "../service/_services";
 import { makeUserEntryRoutes } from "./user/userEntryControllers";
 import { makeControlledChannelsRoutes } from "./controlledChannels/controlledChannelsController";
-import { type G, type LR } from "./routeConsts";
+import { type G, type LR } from "./_routeConsts";
 import type { ProjectLogger } from "../lib/logger";
 
 type MakeRoutes = (p: {
@@ -31,7 +31,7 @@ export const makeRoutes = ({
     menu: {
       method: entryRoutes.menu,
       availableFrom: ["command", "callback"],
-      routes: ["terms", "addControlledChannel"],
+      routes: ["terms", "addControlledChannel", "listControlledChannels"],
     },
     terms: {
       method: entryRoutes.terms,
@@ -50,6 +50,16 @@ export const makeRoutes = ({
       availableFrom: ["command", "callback", "message"],
       commands: ["myChannels"],
       waitsForInput: true,
+      routes: ["controlledChannel"],
+    },
+    controlledChannel: {
+      method: controlledChannelRoutes.controlledChannel,
+      availableFrom: ["callback"],
+      actions: {
+        changeActive: {
+          method: controlledChannelRoutes.changeChannelActive,
+        },
+      },
     },
   } as const;
   return buildRoutes(localRoutes);

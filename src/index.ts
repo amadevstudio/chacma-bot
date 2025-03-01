@@ -1,12 +1,12 @@
 import ENV from "./env";
 
-import { makeRoutes } from "./controller/routes";
+import { makeRoutes } from "./controller/_routes";
 
 import configureI18n from "./public/i18n";
 import { makeMiddlewares } from "./middleware/_middlewares";
 import { makeRepositories } from "./repository/_repositories";
 import { makeServices } from "./service/_services";
-import type { G } from "./controller/routeConsts";
+import type { G } from "./controller/_routeConsts";
 import { setupI18n, type InitializeSystemConfig, initializeBot } from "yau";
 import initializeLogger from "./lib/logger";
 import { createDbConnection } from "./db/drizzle";

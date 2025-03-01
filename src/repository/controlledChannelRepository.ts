@@ -189,6 +189,22 @@ export const makeControlledChannelRepository = function ({
       // Ensure the count is returned as a number
       return result.length > 0 ? Number(result[0].count) : 0;
     },
+
+    getChannelById: async (channelId: number) => {
+      return await db.query.controlledChannelsTable.findFirst({
+        where: eq(controlledChannelsTable.id, channelId),
+      });
+    },
+
+    changeActive: async (channelId: number, isActive: boolean) => {
+      return (
+        await db
+          .update(controlledChannelsTable)
+          .set({ isActive })
+          .where(eq(controlledChannelsTable.id, channelId))
+          .returning({ isActive: controlledChannelsTable.isActive })
+      )[0];
+    },
   } as const;
 };
 

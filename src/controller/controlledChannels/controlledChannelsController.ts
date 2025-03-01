@@ -1,15 +1,25 @@
 import { type Route, type MessageStructure } from "yau";
-import type { MakeServices } from "../../service/_services";
-import type { G } from "../routeConsts";
-import type { ProjectLogger } from "../../lib/logger";
+import {
+  localRouteNameMap,
+  type AvailableActions,
+  type G,
+} from "../_routeConsts";
+import type { ControllerParams } from "../_types";
+import { renderErrorMessage } from "../_general";
+import { buildChannelPageMessages } from "./_views";
 
-type MakeControlledChannelsRoutes = (p: {
-  services: ReturnType<MakeServices>;
-  logger: ProjectLogger;
-}) => {
-  [key in
-    | "addControlledChannel"
-    | "listControlledChannels"]: Route<G>["method"];
+type MakeControlledChannelsRoutes = (p: ControllerParams) => {
+  addControlledChannel: Route<G>["method"];
+  listControlledChannels: Route<G>["method"];
+  controlledChannel: Route<G>["method"];
+  changeChannelActive: Exclude<
+    Route<G>["actions"],
+    undefined
+  >[AvailableActions]["method"];
+};
+
+type ControlledChannelButton = {
+  id: number;
 };
 
 export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
@@ -92,17 +102,13 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
         isOwner: validationResult.isOwner,
         channelName: channelInfo.title!,
       });
-      if ("error" in registeredResult) {
-        await d.render(
-          d.components.emptyStateMessage({
-            text: d.i18n.t([
-              "controlledChannelAdding",
-              "s",
-              "errors",
-              registeredResult.error!,
-            ]),
-          })
-        );
+      if ("error" in registeredResult && registeredResult.error !== undefined) {
+        await renderErrorMessage(d, [
+          "controlledChannelAdding",
+          "s",
+          "errors",
+          registeredResult.error,
+        ]);
         return;
       }
 
@@ -132,17 +138,11 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
       });
 
       if ("error" in pagingObject) {
-        await d.render([
-          {
-            type: "text",
-            text: d.i18n.t([
-              "controlledChannelList",
-              "s",
-              "errors",
-              pagingObject.error ,
-            ]),
-            inlineMarkup: d.components.goBack.buildLayout(),
-          },
+        await renderErrorMessage(d, [
+          "controlledChannelList",
+          "s",
+          "errors",
+          pagingObject.error,
         ]);
         return;
       }
@@ -154,9 +154,10 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
           inlineMarkup: [
             ...pagingObject.pageData.map((channelData) => [
               d.components.inlineButtons.buildState({
-                type: "channel",
+                type: localRouteNameMap.controlledChannel,
                 text: channelData.name ?? "",
-              })
+                data: { id: channelData.id } as ControlledChannelButton,
+              }),
             ]),
             ...pagingObject.markup,
           ],
@@ -164,5 +165,66 @@ export const makeControlledChannelsRoutes: MakeControlledChannelsRoutes = ({
       ];
       d.render(messages);
     },
-  };
+
+    controlledChannel: async (d) => {
+      const channelId = (d.unitedData as ControlledChannelButton).id;
+      const controlledChannel =
+        await services.controlledChannelService.dataForChannelPage(channelId);
+
+      if ("error" in controlledChannel) {
+        await renderErrorMessage(d, [
+          "controlledChannel",
+          "s",
+          "errors",
+          controlledChannel.error,
+        ]);
+        return;
+      }
+      d.services.userStateService.addUserCurrentStateData({ id: channelId });
+
+      d.render(buildChannelPageMessages(controlledChannel, d));
+    },
+    changeChannelActive: async (d) => {
+      const channelId = (d.unitedData as ControlledChannelButton).id;
+      const controlledChannel =
+        await services.controlledChannelService.dataForChannelPage(channelId);
+      if ("error" in controlledChannel) {
+        await renderErrorMessage(d, [
+          "controlledChannel",
+          "s",
+          "errors",
+          controlledChannel.error,
+        ]);
+        return;
+      }
+
+      const result =
+        await services.controlledChannelService.changeChannelActive(
+          channelId,
+          !controlledChannel.isActive
+        );
+      if ("error" in result) {
+        await renderErrorMessage(d, [
+          "controlledChannel",
+          "s",
+          "errors",
+          result.error,
+        ]);
+        return;
+      }
+
+      controlledChannel.isActive = result.isActive;
+
+      await d.notify({
+        message: d.i18n.t([
+          "controlledChannel",
+          "s",
+          "state",
+          result.isActive ? "activated" : "deactivated",
+        ]),
+      });
+      await d.render(buildChannelPageMessages(controlledChannel, d));
+      return;
+    },
+  } as const;
 };

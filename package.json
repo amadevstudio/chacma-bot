@@ -26,6 +26,5 @@
     "pg": "^8.13.3",
     "tslog": "^4.9.3",
     "yau": "/Users/konstantinkovalenko/Projects/Telegram/yau/yau-ts"
-    "yau": "git+https://github.com/amadevstudio/yau"
   }
 }

@@ -5,7 +5,7 @@ export const makeControlledChannelService = function ({
   consts,
   logger,
 }: DbServiceParams) {
-  return {
+  const methods = {
     create: async ({
       ownerChatId,
       channelId,
@@ -77,7 +77,37 @@ export const makeControlledChannelService = function ({
         return { error: "gettingChannels" };
       }
     },
-  };
+
+    dataForChannelPage: async (channelId: number) => {
+      try {
+        const channel =
+          await repositories.controlledChannelRepository.getChannelById(
+            channelId
+          );
+        if (channel === undefined) {
+          return { error: "channelNotFound" };
+        }
+
+        return channel;
+      } catch (e) {
+        logger.error(e);
+        return { error: "general" };
+      }
+    },
+
+    changeChannelActive: async (channelId: number, active: boolean) => {
+      try {
+        return await repositories.controlledChannelRepository.changeActive(
+          channelId,
+          active
+        );
+      } catch (e) {
+        logger.error(e);
+        return { error: "general" };
+      }
+    },
+  } as const;
+  return methods;
 };
 
 export type MakeControlledChannelService = typeof makeControlledChannelService;

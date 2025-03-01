@@ -1,5 +1,5 @@
 import type { Dictionary } from "yau";
-import { addChannelCommands } from "../controller/routes";
+import { addChannelCommands } from "../controller/_routes";
 
 export type AvailableLanguages = "ru" | "en";
 
@@ -293,6 +293,47 @@ function makeControlledChannelList() {
   } as const;
 }
 
+const controlledChannel = {
+  s: {
+    errors: {
+      general: {
+        en: "An error occurred while retrieving the channel information.",
+        ru: "Произошла ошибка при получении информации о канале.",
+      },
+      channelNotFound: {
+        en: "Channel not found.",
+        ru: "Канал не найден.",
+      },
+    },
+    addNewSource: {
+      en: "Add new source",
+      ru: "Добавить новый источник",
+    },
+    showSources: {
+      en: "Show sources",
+      ru: "Показать источники",
+    },
+    state: {
+      active: {
+        en: "Active",
+        ru: "Активен",
+      },
+      activated: {
+        en: "Channel activated",
+        ru: "Канал активирован",
+      },
+      inactive: {
+        en: "Inactive",
+        ru: "Неактивен",
+      },
+      deactivated: {
+        en: "Channel deactivated",
+        ru: "Канал деактивирован",
+      },
+    },
+  },
+};
+
 export default function configureI18n({
   appName,
 }: {
@@ -310,5 +351,6 @@ export default function configureI18n({
 
     controlledChannelAdding: makeControlledChannelAdding(),
     controlledChannelList: makeControlledChannelList(),
+    controlledChannel,
   } as const;
 }

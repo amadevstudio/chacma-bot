@@ -1,5 +1,5 @@
 import type { MessageStructure, ControllerConstructedParams, Route } from "yau";
-import { localRouteNameMap, type G } from "../routeConsts";
+import { localRouteNameMap, type G } from "../_routeConsts";
 
 type MenuData = {
   fromStart?: boolean;
